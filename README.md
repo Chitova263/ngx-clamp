@@ -1,8 +1,13 @@
-# @chitova/ngx-clamp
+# @chitova/ngx-clamp 
+![Build](https://github.com/Chitova263/ngx-clamp/workflows/main/badge.svg)
+[![NPM version](https://img.shields.io/npm/v/@chitovas/ngx-clamp.svg?style=flat-square)](https://www.npmjs.com/package/@chitovas/ngx-clamp) 
+![bundle size](https://img.shields.io/bundlephobia/minzip/@chitovas/ngx-clamp)
 
-Welcome to @chitova/ngx-clamp, an Angular library designed to elegantly manage text overflow within HTML elements. This library allows you to clamp text, adding ellipsis or a truncation text of your choice when the content exceeds a specified height.
 
-# Motivation
+
+Welcome to @chitovas/ngx-clamp, an Angular library designed to elegantly manage text overflow within HTML elements. This library allows you to clamp text, adding ellipsis or a truncation text of your choice when the content exceeds a specified height.
+
+## Motivation
 
 Solves overflow issues on older legacy browsers that don't support the `-webkit-line-clamp` or `line-clamp` property, ensuring consistent behavior across different platforms.
 
@@ -19,13 +24,13 @@ Solves overflow issues on older legacy browsers that don't support the `-webkit-
 Install the package using npm:
 
 ```bash
-npm install @chitova/ngx-clamp
+npm install @chitovas/ngx-clamp
 ```
 
 ## Usage
 
 ```ts
-import { NgxClamp } from '@chitova/ngx-clamp';
+import { NgxClamp } from '@chitovas/ngx-clamp';
 
 @Component({
     selector: 'my-component',
