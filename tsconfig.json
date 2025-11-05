@@ -1,37 +1,35 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "paths": {
-      "@chitova/ngx-clamp": [
-        "./dist/chitova/ngx-clamp"
-      ]
+    "compileOnSave": false,
+    "compilerOptions": {
+        "paths": {
+            "@chitova/ngx-clamp": ["./dist/chitova/ngx-clamp"]
+        },
+        "strict": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "skipLibCheck": true,
+        "isolatedModules": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "target": "ES2022",
+        "module": "preserve"
     },
-    "strict": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
-    "isolatedModules": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "ES2022",
-    "module": "preserve"
-  },
-  "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "typeCheckHostBindings": true,
-    "strictTemplates": true
-  },
-  "files": [],
-  "references": [
-    {
-      "path": "./projects/chitova/ngx-clamp/tsconfig.lib.json"
+    "angularCompilerOptions": {
+        "enableI18nLegacyMessageIdFormat": false,
+        "strictInjectionParameters": true,
+        "strictInputAccessModifiers": true,
+        "typeCheckHostBindings": true,
+        "strictTemplates": true
     },
-    {
-      "path": "./projects/chitova/ngx-clamp/tsconfig.spec.json"
-    }
-  ]
+    "files": [],
+    "references": [
+        {
+            "path": "./projects/chitova/ngx-clamp/tsconfig.lib.json"
+        },
+        {
+            "path": "./projects/chitova/ngx-clamp/tsconfig.spec.json"
+        }
+    ]
 }

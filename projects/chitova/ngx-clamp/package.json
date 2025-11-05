@@ -1,12 +1,29 @@
 {
-  "name": "@chitova/ngx-clamp",
-  "version": "0.0.1",
-  "peerDependencies": {
-    "@angular/common": "^20.3.0",
-    "@angular/core": "^20.3.0"
-  },
-  "dependencies": {
-    "tslib": "^2.3.0"
-  },
-  "sideEffects": false
+    "name": "@chitovas/ngx-clamp",
+    "version": "0.1.1",
+    "author": "Nigel Mukandi",
+    "description": "angular library designed to elegantly manage text overflow within HTML elements. This library allows you to clamp text, adding ellipsis or a truncation text of your choice when the content exceeds a specified height.",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/Chitova263/ngx-clamp.git"
+    },
+    "keywords": [
+        "clamp",
+        "line-clamp",
+        "webkit-line-clamp",
+        "angular",
+        "directive"
+    ],
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    },
+    "peerDependencies": {
+        "@angular/common": "^20.3.0",
+        "@angular/core": "^20.3.0"
+    },
+    "dependencies": {
+        "tslib": "^2.3.0"
+    },
+    "sideEffects": false
 }

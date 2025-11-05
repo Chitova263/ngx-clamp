@@ -1,0 +1,31 @@
+name: main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+
+      - name: setup nodejs
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
+
+      - name: install dependencies
+        run: npm ci --include=optional
+
+      - name: check formatting
+        run: npm run prettier:check
+
+      - name: build
+        run: npm run build
+
+      - name: upload artifact
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        with:
+          name: artifact
+          path: dist/

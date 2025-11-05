@@ -1,30 +1,29 @@
 {
-  "name": "chitova",
-  "version": "0.1.0",
-  "scripts": {
-    "build": "ng build --configuration production",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
-  },
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": true
-  },
-  "private": false,
-  "dependencies": {
-    "@angular/common": "^20.3.0",
-    "@angular/compiler": "^20.3.0",
-    "@angular/core": "^20.3.0",
-    "@angular/platform-browser": "^20.3.0",
-    "tslib": "^2.3.0"
-  },
-  "devDependencies": {
-    "@angular/build": "^20.3.8",
-    "@angular/cli": "^20.3.8",
-    "@angular/compiler-cli": "^20.3.0",
-    "eslint": "^9.39.1",
-    "ng-packagr": "^20.3.0",
-    "prettier": "^3.6.2",
-    "typescript": "~5.9.2"
-  }
+    "name": "chitova",
+    "version": "0.1.0",
+    "scripts": {
+        "build": "ng build --project=@chitova/ngx-clamp --configuration production",
+        "watch": "ng build --watch --configuration development",
+        "publish": "npm publish ./dist/chitova/ngx-clamp --access public",
+        "prettier:fix": "prettier . --write",
+        "prettier:check": "prettier . --check",
+        "copy-files": "cp README.md dist/chitova/ngx-clamp/"
+    },
+    "private": false,
+    "dependencies": {
+        "@angular/common": "^20.3.0",
+        "@angular/compiler": "^20.3.0",
+        "@angular/core": "^20.3.0",
+        "@angular/platform-browser": "^20.3.0",
+        "tslib": "^2.3.0"
+    },
+    "devDependencies": {
+        "@angular/build": "^20.3.8",
+        "@angular/cli": "^20.3.8",
+        "@angular/compiler-cli": "^20.3.0",
+        "eslint": "^9.39.1",
+        "ng-packagr": "^20.3.0",
+        "prettier": "3.6.2",
+        "typescript": "~5.9.2"
+    }
 }
