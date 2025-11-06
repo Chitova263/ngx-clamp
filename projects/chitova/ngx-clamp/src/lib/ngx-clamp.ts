@@ -2,17 +2,21 @@ import { AfterViewInit, Directive, ElementRef, Input, OnChanges, SimpleChanges }
 
 @Directive({
     selector: '[ngxClamp]',
+    standalone: true,
 })
 export class NgxClamp implements AfterViewInit, OnChanges {
-    @Input({ required: true })
-    public maxHeight: number = 0;
+    @Input()
+    public maxHeight: number | null = null;
 
     @Input()
-    public truncationCharacters: string = '...';
+    public lines: number = 0;
 
     public maxLines: number = 0;
 
     private readonly splitOnWordsCharacter: string = ' ';
+
+    @Input()
+    public truncationCharacters: string = '...';
 
     constructor(private readonly htmlElementRef: ElementRef<HTMLElement>) {}
 
@@ -21,15 +25,18 @@ export class NgxClamp implements AfterViewInit, OnChanges {
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
-        if (changes['height']) {
+        if (changes['maxHeight'] || changes['lines']) {
             this.clamp();
         }
     }
 
     private clamp(): void {
-        this.maxLines = this.getMaxLines();
+        if (!this.maxHeight && !this.lines) {
+            return;
+        }
+        this.maxLines = this.lines ? this.lines : this.getMaxLines();
         const hostHtmlElement: HTMLElement = this.htmlElementRef.nativeElement;
-        const maxRequiredHeight: number = Math.max(this.maxHeight, this.getMaxHeight(this.maxLines, hostHtmlElement));
+        const maxRequiredHeight: number = Math.max(this.maxHeight ?? 0, this.getMaxHeight(this.maxLines, hostHtmlElement));
         if (maxRequiredHeight < hostHtmlElement.clientHeight) {
             const lastChild: ChildNode = this.getLastChild(hostHtmlElement);
             if (lastChild) {
@@ -45,7 +52,7 @@ export class NgxClamp implements AfterViewInit, OnChanges {
         words: string[] | undefined = undefined,
         isCurrentNodeValueSplitIntoWords: boolean = false
     ): void {
-        // Removes truncation characters from node text
+        // Removes truncation character from node text
         const nodeValue: string | undefined = node.nodeValue?.replace(this.truncationCharacters, '');
 
         if (!words && nodeValue) {
