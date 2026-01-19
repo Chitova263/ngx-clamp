@@ -5,6 +5,7 @@ import {
     EventEmitter,
     Input,
     OnChanges,
+    OnDestroy,
     Output,
     SimpleChanges,
 } from '@angular/core';
@@ -24,7 +25,7 @@ import {
     selector: '[ngxClamp]',
     standalone: true,
 })
-export class NgxClamp implements AfterViewInit, OnChanges {
+export class NgxClamp implements AfterViewInit, OnChanges, OnDestroy {
     /**
      * Maximum height in pixels before clamping. Use either `maxHeight` or `lines`, not both.
      * If both are provided, `lines` takes precedence.
@@ -53,18 +54,49 @@ export class NgxClamp implements AfterViewInit, OnChanges {
     public clamped = new EventEmitter<boolean>();
 
     private readonly splitOnWordsCharacter: string = ' ';
-    private maxLines: number = 0;
+    private cachedLineHeight: number | null = null;
+    private originalContent: string | null = null;
 
     constructor(private readonly htmlElementRef: ElementRef<HTMLElement>) {}
 
     public ngAfterViewInit(): void {
+        this.storeOriginalContent();
         this.clamp();
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes['maxHeight'] || changes['lines']) {
+            this.invalidateCache();
+            this.restoreOriginalContent();
             this.clamp();
         }
+    }
+
+    public ngOnDestroy(): void {
+        this.invalidateCache();
+    }
+
+    /**
+     * Stores original content for restoration on input changes.
+     */
+    private storeOriginalContent(): void {
+        this.originalContent = this.htmlElementRef.nativeElement.innerHTML;
+    }
+
+    /**
+     * Restores original content before re-clamping.
+     */
+    private restoreOriginalContent(): void {
+        if (this.originalContent !== null) {
+            this.htmlElementRef.nativeElement.innerHTML = this.originalContent;
+        }
+    }
+
+    /**
+     * Invalidates cached values.
+     */
+    private invalidateCache(): void {
+        this.cachedLineHeight = null;
     }
 
     private clamp(): void {
@@ -73,14 +105,14 @@ export class NgxClamp implements AfterViewInit, OnChanges {
         }
 
         const hostElement = this.htmlElementRef.nativeElement;
-        this.maxLines = this.lines > 0 ? this.lines : this.getMaxLines();
-        const maxRequiredHeight = this.calculateMaxHeight(this.maxLines, hostElement);
+        const maxLines = this.lines > 0 ? this.lines : this.getMaxLines();
+        const maxRequiredHeight = this.calculateMaxHeight(maxLines, hostElement);
         const currentHeight = hostElement.clientHeight;
 
         if (maxRequiredHeight < currentHeight) {
-            const lastChild = this.getLastChild(hostElement);
+            const lastChild = this.getLastTextNode(hostElement);
             if (lastChild) {
-                this.truncate(maxRequiredHeight, lastChild);
+                this.truncateWithBinarySearch(maxRequiredHeight, lastChild);
                 this.clamped.emit(true);
             }
         } else {
@@ -110,53 +142,69 @@ export class NgxClamp implements AfterViewInit, OnChanges {
     }
 
     /**
-     * Recursively removes words from the text until content fits within the maximum required height.
+     * Uses binary search to find the optimal number of words that fit within the max height.
+     * This is O(log n) compared to the previous O(n) linear approach.
      */
-    private truncate(
-        maxRequiredHeight: number,
-        node: ChildNode,
-        words: string[] | undefined = undefined,
-        isCurrentNodeValueSplitIntoWords: boolean = false
-    ): void {
-        const nodeValue = node.nodeValue?.replace(this.truncationText, '');
+    private truncateWithBinarySearch(maxRequiredHeight: number, node: ChildNode): void {
+        const hostElement = this.htmlElementRef.nativeElement;
 
-        if (!words && nodeValue) {
-            words = nodeValue.split(this.splitOnWordsCharacter);
-            isCurrentNodeValueSplitIntoWords = true;
-        }
+        // Iteratively process text nodes until content fits
+        while (hostElement.clientHeight > maxRequiredHeight) {
+            const nodeValue = node.nodeValue?.replace(this.truncationText, '');
+            if (!nodeValue) {
+                // Move to previous text node
+                node.nodeValue = this.truncationText;
+                const prevNode = this.getLastTextNode(hostElement);
+                if (!prevNode || prevNode === node) {
+                    return;
+                }
+                node = prevNode;
+                continue;
+            }
 
-        if (words) {
-            node.nodeValue = words.join(this.splitOnWordsCharacter) + this.truncationText;
-            const isTextFits = this.htmlElementRef.nativeElement.clientHeight <= maxRequiredHeight;
-            if (isTextFits) {
+            const words = nodeValue.split(this.splitOnWordsCharacter);
+
+            if (words.length <= 1) {
+                // Single word or empty - move to previous node
+                node.nodeValue = this.truncationText;
+                const prevNode = this.getLastTextNode(hostElement);
+                if (!prevNode || prevNode === node) {
+                    return;
+                }
+                node = prevNode;
+                continue;
+            }
+
+            // Binary search for optimal word count
+            let low = 0;
+            let high = words.length;
+            let optimalCount = 0;
+
+            while (low < high) {
+                const mid = Math.floor((low + high + 1) / 2);
+                node.nodeValue = words.slice(0, mid).join(this.splitOnWordsCharacter) + this.truncationText;
+
+                if (hostElement.clientHeight <= maxRequiredHeight) {
+                    optimalCount = mid;
+                    low = mid;
+                } else {
+                    high = mid - 1;
+                }
+            }
+
+            if (optimalCount > 0) {
+                node.nodeValue = words.slice(0, optimalCount).join(this.splitOnWordsCharacter) + this.truncationText;
                 return;
             }
-        }
 
-        // If there are words left to remove, remove the last one and check if content fits
-        if (words && words.length > 1) {
-            words.pop();
-            node.nodeValue = words.join(this.splitOnWordsCharacter) + this.truncationText;
-
-            const isTextFits = this.htmlElementRef.nativeElement.clientHeight <= maxRequiredHeight;
-            if (isTextFits) {
-                return;
-            }
-        } else {
-            words = undefined;
-        }
-
-        // No valid words produced - move to the previous text node
-        if (!words && isCurrentNodeValueSplitIntoWords) {
+            // No words fit - move to previous node
             node.nodeValue = this.truncationText;
-            const newLastChild = this.getLastChild(this.htmlElementRef.nativeElement);
-            if (newLastChild) {
-                return this.truncate(maxRequiredHeight, newLastChild);
+            const prevNode = this.getLastTextNode(hostElement);
+            if (!prevNode || prevNode === node) {
+                return;
             }
-            return;
+            node = prevNode;
         }
-
-        return this.truncate(maxRequiredHeight, node, words, isCurrentNodeValueSplitIntoWords);
     }
 
     /**
@@ -164,25 +212,31 @@ export class NgxClamp implements AfterViewInit, OnChanges {
      * If `lines` is set, it takes precedence over `maxHeight`.
      */
     private calculateMaxHeight(maxLines: number, element: HTMLElement): number {
-        // lines takes precedence over maxHeight
         if (this.lines > 0) {
             return this.getLineHeight(element) * maxLines;
         }
         return this.maxHeight ?? 0;
     }
 
+    /**
+     * Gets line height with caching to avoid repeated getComputedStyle calls.
+     */
     private getLineHeight(element: HTMLElement): number {
+        if (this.cachedLineHeight !== null) {
+            return this.cachedLineHeight;
+        }
+
         const computedStyle = getComputedStyle(element);
         const lineHeight = computedStyle.lineHeight;
 
         if (lineHeight === 'normal') {
-            // Normal line heights vary from browser to browser.
-            // The spec recommends a value between 1.0 and 1.2 of the font size.
             const fontSize = parseInt(computedStyle.fontSize, 10);
-            return Math.ceil(fontSize * 1.2);
+            this.cachedLineHeight = Math.ceil(fontSize * 1.2);
+        } else {
+            this.cachedLineHeight = Math.ceil(parseInt(lineHeight, 10));
         }
 
-        return Math.ceil(parseInt(lineHeight, 10));
+        return this.cachedLineHeight;
     }
 
     /**
@@ -196,30 +250,42 @@ export class NgxClamp implements AfterViewInit, OnChanges {
     }
 
     /**
-     * Recursively finds the last text node in the element tree.
+     * Iteratively finds the last text node in the element tree.
      * Removes empty or truncation-only nodes along the way.
      */
-    private getLastChild(node: ChildNode): ChildNode | null {
-        if (!node.lastChild) {
-            return node;
+    private getLastTextNode(node: ChildNode): ChildNode | null {
+        let current: ChildNode | null = node;
+
+        while (current) {
+            // If no children, this is the node we want
+            if (!current.lastChild) {
+                return current;
+            }
+
+            // Go to last child
+            let lastChild: ChildNode | null = current.lastChild;
+
+            // If last child has children, go deeper
+            if (lastChild.childNodes && lastChild.childNodes.length > 0) {
+                current = lastChild;
+                continue;
+            }
+
+            // Check if last child is empty or only contains truncation text
+            const lastChildValue = lastChild.nodeValue;
+            if (!lastChildValue || lastChildValue === '' || lastChildValue === this.truncationText) {
+                // Remove empty node and try again
+                if (lastChild.parentNode) {
+                    lastChild.parentNode.removeChild(lastChild);
+                }
+                current = this.htmlElementRef.nativeElement;
+                continue;
+            }
+
+            // Found valid text node
+            return lastChild;
         }
 
-        // Current element has children, need to go deeper to get the last text node
-        if (node.lastChild.childNodes && node.lastChild.childNodes.length > 0) {
-            return this.getLastChild(node.lastChild);
-        }
-
-        // This is the absolute last child, but it's empty or only contains truncation text - remove it
-        const lastChildValue = node.lastChild.nodeValue;
-        if (
-            node.lastChild.parentNode &&
-            (!lastChildValue || lastChildValue === '' || lastChildValue === this.truncationText)
-        ) {
-            node.lastChild.parentNode.removeChild(node.lastChild);
-            return this.getLastChild(this.htmlElementRef.nativeElement);
-        }
-
-        // This is the last valid text node
-        return node.lastChild;
+        return null;
     }
 }

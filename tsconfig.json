@@ -30,6 +30,9 @@
         },
         {
             "path": "./projects/chitova/ngx-clamp/tsconfig.spec.json"
+        },
+        {
+            "path": "./projects/demo/tsconfig.app.json"
         }
     ]
 }

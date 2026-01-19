@@ -3,6 +3,10 @@
     "version": "0.1.0",
     "scripts": {
         "build": "ng build --project=@chitova/ngx-clamp --configuration production",
+        "build:demo": "npm run build && ng build --project=demo",
+        "start": "npm run build && ng serve --project=demo",
+        "test": "ng test --project=@chitova/ngx-clamp",
+        "test:watch": "ng test --project=@chitova/ngx-clamp --watch",
         "watch": "ng build --watch --configuration development",
         "publish": "npm publish ./dist/chitova/ngx-clamp --access public",
         "prettier:fix": "prettier . --write",
@@ -14,14 +18,23 @@
         "@angular/common": "^20.3.0",
         "@angular/compiler": "^20.3.0",
         "@angular/core": "^20.3.0",
+        "@angular/forms": "^20.3.0",
         "@angular/platform-browser": "^20.3.0",
-        "tslib": "^2.3.0"
+        "tslib": "^2.3.0",
+        "zone.js": "~0.15.0"
     },
     "devDependencies": {
         "@angular/build": "^20.3.8",
         "@angular/cli": "^20.3.8",
         "@angular/compiler-cli": "^20.3.0",
+        "@types/jasmine": "~5.1.0",
         "eslint": "^9.39.1",
+        "jasmine-core": "~5.6.0",
+        "karma": "~6.4.0",
+        "karma-chrome-launcher": "~3.2.0",
+        "karma-coverage": "~2.2.0",
+        "karma-jasmine": "~5.1.0",
+        "karma-jasmine-html-reporter": "~2.1.0",
         "ng-packagr": "^20.3.0",
         "prettier": "3.6.2",
         "typescript": "~5.9.2"
