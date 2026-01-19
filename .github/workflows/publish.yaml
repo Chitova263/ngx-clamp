@@ -1,27 +1,36 @@
 name: publish
 
 on:
+  release:
+    types: [created]
   workflow_dispatch:
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: setup nodejs
-        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
 
-      - name: install dependencies
-        run: npm ci --include=optional
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
 
-      - name: build
+      - name: Build library
         run: |
           npm run build
           npm run copy-files
 
-      - name: publish
+      - name: Run tests
+        run: npm test -- --no-watch --browsers=ChromeHeadless
+
+      - name: Publish to npm
+        run: npm publish ./dist/chitova/ngx-clamp --access public
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm run publish
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

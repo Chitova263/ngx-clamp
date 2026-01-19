@@ -1,0 +1,12 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../../out-tsc/app",
+        "types": [],
+        "paths": {
+            "@chitovas/ngx-clamp": ["../../dist/chitova/ngx-clamp"]
+        }
+    },
+    "files": ["src/main.ts"],
+    "include": ["src/**/*.d.ts", "src/**/*.ts"]
+}
