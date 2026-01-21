@@ -83,7 +83,7 @@
     color: #444;
 }
 
-.controls input[type="range"] {
+.controls input[type='range'] {
     flex: 1;
     max-width: 200px;
     accent-color: #667eea;
@@ -124,7 +124,9 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
 }
 
 .article-card:hover {

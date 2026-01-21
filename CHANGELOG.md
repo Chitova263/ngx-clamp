@@ -8,10 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+
 - Improved truncation performance with binary search algorithm (O(n) → O(log n))
 - Refactored code for better readability and maintainability
 
 ### Fixed
+
 - Fixed line height calculation for decimal font sizes
 - Fixed re-clamping when `lines` or `maxHeight` inputs change dynamically
 - Fixed `getComputedStyle` API usage
@@ -19,19 +21,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.2] - 2024-01-15
 
 ### Added
+
 - Demo application showcasing all features
 
 ## [0.2.1] - 2024-01-10
 
 ### Added
+
 - Support for clamping by number of lines via `lines` input
 
 ### Fixed
+
 - Typos in package name in README
 
 ## [0.2.0] - 2024-01-05
 
 ### Added
+
 - Initial public release
 - `ngxClamp` directive for text clamping
 - Support for `maxHeight` constraint

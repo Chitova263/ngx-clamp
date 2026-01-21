@@ -19,18 +19,14 @@
             <div class="controls">
                 <label>
                     Lines: <strong>{{ lineCount() }}</strong>
-                    <input
-                        type="range"
-                        min="1"
-                        max="6"
-                        [value]="lineCount()"
-                        (input)="updateLineCount($event)"
-                    />
+                    <input type="range" min="1" max="6" [value]="lineCount()" (input)="updateLineCount($event)" />
                 </label>
             </div>
             <div class="playground-content">
                 <div ngxClamp [lines]="lineCount()">
-                    Angular is a platform for building mobile and desktop web applications. With Angular, you have a framework for building efficient and sophisticated single-page apps. Angular provides a complete solution including routing, forms management, client-server communication, and more. It uses TypeScript for type safety and modern JavaScript features.
+                    Angular is a platform for building mobile and desktop web applications. With Angular, you have a framework for building
+                    efficient and sophisticated single-page apps. Angular provides a complete solution including routing, forms management,
+                    client-server communication, and more. It uses TypeScript for type safety and modern JavaScript features.
                 </div>
             </div>
             <pre class="code-snippet"><code>&lt;div ngxClamp [lines]="{{ lineCount() }}"&gt;
@@ -46,25 +42,20 @@
 
         <div class="article-grid">
             @for (article of articles; track article.id) {
-                <article class="article-card">
-                    <img [src]="article.image" [alt]="article.title" class="article-image" />
-                    <div class="article-content">
-                        <span class="article-date">{{ article.date }}</span>
-                        <h3>{{ article.title }}</h3>
-                        <p class="article-author">By {{ article.author }}</p>
-                        <div
-                            ngxClamp
-                            [lines]="isExpanded(article.id) ? 999 : 3"
-                            truncationCharacters="..."
-                            class="article-excerpt"
-                        >
-                            {{ article.content }}
-                        </div>
-                        <button class="btn-link" (click)="toggleCard(article.id)">
-                            {{ isExpanded(article.id) ? 'Show less' : 'Read more' }}
-                        </button>
+            <article class="article-card">
+                <img [src]="article.image" [alt]="article.title" class="article-image" />
+                <div class="article-content">
+                    <span class="article-date">{{ article.date }}</span>
+                    <h3>{{ article.title }}</h3>
+                    <p class="article-author">By {{ article.author }}</p>
+                    <div ngxClamp [lines]="isExpanded(article.id) ? 999 : 3" truncationCharacters="..." class="article-excerpt">
+                        {{ article.content }}
                     </div>
-                </article>
+                    <button class="btn-link" (click)="toggleCard(article.id)">
+                        {{ isExpanded(article.id) ? 'Show less' : 'Read more' }}
+                    </button>
+                </div>
+            </article>
             }
         </div>
     </section>
@@ -76,25 +67,23 @@
 
         <div class="product-grid">
             @for (product of products; track product.name) {
-                <div class="product-card">
-                    <img [src]="product.image" [alt]="product.name" class="product-image" />
-                    <div class="product-content">
-                        <div class="product-rating">
-                            @for (star of [1,2,3,4,5]; track star) {
-                                <span class="star" [class.filled]="star <= product.rating">&#9733;</span>
-                            }
-                            <span class="rating-value">{{ product.rating }}</span>
-                        </div>
-                        <h3 ngxClamp [lines]="1">{{ product.name }}</h3>
-                        <p ngxClamp [lines]="2" truncationCharacters="..." class="product-desc">
-                            {{ product.description }}
-                        </p>
-                        <div class="product-footer">
-                            <span class="price">\${{ product.price }}</span>
-                            <button class="btn-primary">Add to Cart</button>
-                        </div>
+            <div class="product-card">
+                <img [src]="product.image" [alt]="product.name" class="product-image" />
+                <div class="product-content">
+                    <div class="product-rating">
+                        @for (star of [1,2,3,4,5]; track star) {
+                        <span class="star" [class.filled]="star <= product.rating">&#9733;</span>
+                        }
+                        <span class="rating-value">{{ product.rating }}</span>
+                    </div>
+                    <h3 ngxClamp [lines]="1">{{ product.name }}</h3>
+                    <p ngxClamp [lines]="2" truncationCharacters="..." class="product-desc">{{ product.description }}</p>
+                    <div class="product-footer">
+                        <span class="price">\${{ product.price }}</span>
+                        <button class="btn-primary">Add to Cart</button>
                     </div>
                 </div>
+            </div>
             }
         </div>
     </section>
@@ -106,18 +95,16 @@
 
         <div class="testimonials-grid">
             @for (testimonial of testimonials; track testimonial.name) {
-                <blockquote class="testimonial-card">
-                    <p ngxClamp [lines]="4" truncationCharacters=" [...]" class="testimonial-quote">
-                        "{{ testimonial.quote }}"
-                    </p>
-                    <footer class="testimonial-author">
-                        <img [src]="testimonial.avatar" [alt]="testimonial.name" class="avatar" />
-                        <div>
-                            <cite>{{ testimonial.name }}</cite>
-                            <span>{{ testimonial.role }}</span>
-                        </div>
-                    </footer>
-                </blockquote>
+            <blockquote class="testimonial-card">
+                <p ngxClamp [lines]="4" truncationCharacters=" [...]" class="testimonial-quote">"{{ testimonial.quote }}"</p>
+                <footer class="testimonial-author">
+                    <img [src]="testimonial.avatar" [alt]="testimonial.name" class="avatar" />
+                    <div>
+                        <cite>{{ testimonial.name }}</cite>
+                        <span>{{ testimonial.role }}</span>
+                    </div>
+                </footer>
+            </blockquote>
             }
         </div>
     </section>

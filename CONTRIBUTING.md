@@ -17,18 +17,18 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 1. Fork the repository
 2. Clone your fork:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/ngx-clamp.git
-   cd ngx-clamp
-   ```
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/ngx-clamp.git
+    cd ngx-clamp
+    ```
 3. Install dependencies:
-   ```bash
-   npm install
-   ```
+    ```bash
+    npm install
+    ```
 4. Start the demo app:
-   ```bash
-   npm start
-   ```
+    ```bash
+    npm start
+    ```
 
 ## Development Workflow
 
@@ -61,6 +61,7 @@ npm run prettier:fix
 ### Branch Naming
 
 Use descriptive branch names:
+
 - `feature/add-new-option` - New features
 - `fix/line-height-calculation` - Bug fixes
 - `docs/update-readme` - Documentation updates
@@ -78,6 +79,7 @@ type(scope): description
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 Examples:
+
 - `feat(directive): add support for character-based clamping`
 - `fix(truncate): handle empty text nodes`
 - `docs(readme): add usage examples`
@@ -103,6 +105,7 @@ Examples:
 ### Bug Reports
 
 Include:
+
 - Angular version
 - Browser and version
 - Minimal reproduction steps
@@ -111,6 +114,7 @@ Include:
 ### Feature Requests
 
 Include:
+
 - Use case description
 - Proposed API (if applicable)
 - Alternatives considered

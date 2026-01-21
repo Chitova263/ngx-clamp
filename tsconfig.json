@@ -25,14 +25,14 @@
     },
     "files": [],
     "references": [
-      {
-        "path": "./projects/chitova/ngx-clamp/tsconfig.lib.json"
-      },
-      {
-        "path": "./projects/chitova/ngx-clamp/tsconfig.spec.json"
-      },
-      {
-        "path": "./projects/demo/tsconfig.app.json"
-      }
+        {
+            "path": "./projects/chitova/ngx-clamp/tsconfig.lib.json"
+        },
+        {
+            "path": "./projects/chitova/ngx-clamp/tsconfig.spec.json"
+        },
+        {
+            "path": "./projects/demo/tsconfig.app.json"
+        }
     ]
 }

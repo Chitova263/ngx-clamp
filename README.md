@@ -27,11 +27,7 @@ import { NgxClamp } from '@chitovas/ngx-clamp';
     selector: 'app-example',
     standalone: true,
     imports: [NgxClamp],
-    template: `
-        <div ngxClamp [lines]="3">
-            Long text content that will be clamped...
-        </div>
-    `,
+    template: ` <div ngxClamp [lines]="3">Long text content that will be clamped...</div> `,
 })
 export class ExampleComponent {}
 ```
@@ -39,26 +35,22 @@ export class ExampleComponent {}
 ### Clamp by Height
 
 ```html
-<div ngxClamp [maxHeight]="100">
-    Content clamped at 100px height...
-</div>
+<div ngxClamp [maxHeight]="100">Content clamped at 100px height...</div>
 ```
 
 ### Custom Truncation Text
 
 ```html
-<div ngxClamp [lines]="3" truncationText=" Read more...">
-    Content with custom truncation indicator...
-</div>
+<div ngxClamp [lines]="3" truncationText=" Read more...">Content with custom truncation indicator...</div>
 ```
 
 ## API
 
-| Input              | Type     | Default | Description                              |
-| ------------------ | -------- | ------- | ---------------------------------------- |
-| `lines`            | `number` | -       | Number of lines before clamping          |
-| `maxHeight`        | `number` | -       | Maximum height (px) before clamping      |
-| `truncationText`   | `string` | `'...'` | Text appended to clamped content         |
+| Input            | Type     | Default | Description                         |
+| ---------------- | -------- | ------- | ----------------------------------- |
+| `lines`          | `number` | -       | Number of lines before clamping     |
+| `maxHeight`      | `number` | -       | Maximum height (px) before clamping |
+| `truncationText` | `string` | `'...'` | Text appended to clamped content    |
 
 Use either `lines` or `maxHeight`. If both are provided, `lines` takes precedence.
 

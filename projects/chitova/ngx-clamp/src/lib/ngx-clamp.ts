@@ -52,10 +52,7 @@ export class NgxClamp implements AfterViewInit, OnChanges {
 
         this.maxLines = this.lines || this.calculateMaxLines();
 
-        const maxAllowedHeight = Math.max(
-            this.maxHeight ?? 0,
-            this.getLineHeight() * this.maxLines
-        );
+        const maxAllowedHeight = Math.max(this.maxHeight ?? 0, this.getLineHeight() * this.maxLines);
 
         const needsTruncation = this.element.clientHeight > maxAllowedHeight;
         if (needsTruncation) {
@@ -161,9 +158,8 @@ export class NgxClamp implements AfterViewInit, OnChanges {
         }
 
         // Skip empty or truncation-only nodes
-        const isEmptyNode = !node.lastChild.nodeValue
-            || node.lastChild.nodeValue === ''
-            || node.lastChild.nodeValue === this.truncationCharacters;
+        const isEmptyNode =
+            !node.lastChild.nodeValue || node.lastChild.nodeValue === '' || node.lastChild.nodeValue === this.truncationCharacters;
 
         if (isEmptyNode && node.lastChild.parentNode) {
             node.lastChild.parentNode.removeChild(node.lastChild);
