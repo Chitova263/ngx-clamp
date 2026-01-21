@@ -1,144 +1,175 @@
 import { AfterViewInit, Directive, ElementRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 
+const WORD_SEPARATOR = ' ';
+const DEFAULT_LINE_HEIGHT_MULTIPLIER = 1.187;
+
 @Directive({
     selector: '[ngxClamp]',
     standalone: true,
 })
 export class NgxClamp implements AfterViewInit, OnChanges {
-    @Input()
-    public maxHeight: number | null = null;
+    @Input() maxHeight: number | null = null;
+    @Input() lines: number = 0;
+    @Input() truncationCharacters: string = '...';
 
-    @Input()
-    public lines: number = 0;
+    maxLines: number = 0;
 
-    public maxLines: number = 0;
+    private cachedLineHeight: number | null = null;
+    private originalContent: string | null = null;
+    private isInitialized: boolean = false;
+    private readonly element: HTMLElement;
 
-    private readonly splitOnWordsCharacter: string = ' ';
+    constructor(elementRef: ElementRef<HTMLElement>) {
+        this.element = elementRef.nativeElement;
+    }
 
-    @Input()
-    public truncationCharacters: string = '...';
-
-    constructor(private readonly htmlElementRef: ElementRef<HTMLElement>) {}
-
-    public ngAfterViewInit(): void {
+    ngAfterViewInit(): void {
+        this.originalContent = this.element.innerHTML;
+        this.isInitialized = true;
         this.clamp();
     }
 
-    public ngOnChanges(changes: SimpleChanges): void {
-        if (changes['maxHeight'] || changes['lines']) {
+    ngOnChanges(changes: SimpleChanges): void {
+        const shouldReclamp = changes['maxHeight'] || changes['lines'];
+        if (shouldReclamp && this.isInitialized) {
+            this.cachedLineHeight = null;
+            this.restoreOriginalContent();
             this.clamp();
         }
     }
 
+    private restoreOriginalContent(): void {
+        if (this.originalContent !== null) {
+            this.element.innerHTML = this.originalContent;
+        }
+    }
+
     private clamp(): void {
-        if (!this.maxHeight && !this.lines) {
+        const hasConstraints = this.maxHeight || this.lines;
+        if (!hasConstraints) {
             return;
         }
-        this.maxLines = this.lines ? this.lines : this.getMaxLines();
-        const hostHtmlElement: HTMLElement = this.htmlElementRef.nativeElement;
-        const maxRequiredHeight: number = Math.max(this.maxHeight ?? 0, this.getMaxHeight(this.maxLines, hostHtmlElement));
-        if (maxRequiredHeight < hostHtmlElement.clientHeight) {
-            const lastChild: ChildNode = this.getLastChild(hostHtmlElement);
-            if (lastChild) {
-                this.truncate(maxRequiredHeight, lastChild);
+
+        this.maxLines = this.lines || this.calculateMaxLines();
+
+        const maxAllowedHeight = Math.max(
+            this.maxHeight ?? 0,
+            this.getLineHeight() * this.maxLines
+        );
+
+        const needsTruncation = this.element.clientHeight > maxAllowedHeight;
+        if (needsTruncation) {
+            const textNode = this.findDeepestTextNode(this.element);
+            if (textNode) {
+                this.truncateNode(textNode, maxAllowedHeight);
             }
         }
     }
 
-    // Recursively removes words from the text until its width or height is beneath maximum required height.
-    private truncate(
-        maxRequiredHeight: number,
-        node: ChildNode,
-        words: string[] | undefined = undefined,
-        isCurrentNodeValueSplitIntoWords: boolean = false
-    ): void {
-        // Removes truncation character from node text
-        const nodeValue: string | undefined = node.nodeValue?.replace(this.truncationCharacters, '');
-
-        if (!words && nodeValue) {
-            words = nodeValue.split(this.splitOnWordsCharacter);
-            isCurrentNodeValueSplitIntoWords = true;
+    /**
+     * Uses binary search to find the optimal number of words that fit within maxHeight.
+     * Falls back to previous text node if current node's first word doesn't fit.
+     */
+    private truncateNode(node: ChildNode, maxHeight: number): void {
+        const text = node.nodeValue;
+        if (!text) {
+            return;
         }
 
-        if (words) {
-            const isTexFits: boolean = this.htmlElementRef.nativeElement.clientHeight <= maxRequiredHeight;
-            node.nodeValue = words.join(this.splitOnWordsCharacter) + this.truncationCharacters;
-            if (isTexFits) {
-                return;
-            }
+        const words = text.split(WORD_SEPARATOR);
+
+        // Early exit: text already fits
+        if (this.textFits(node, text + this.truncationCharacters, maxHeight)) {
+            node.nodeValue = text;
+            return;
         }
 
-        // If there are words left to remove, remove the last one and see if the nodeValue fits.
-        if (words && words.length > 1) {
-            words.pop();
-            node.nodeValue = words.join(this.splitOnWordsCharacter) + this.truncationCharacters;
-        }
-        // No more words can be removed using this character
-        else {
-            words = undefined;
-        }
-
-        if (words) {
-            const isTexFits: boolean = this.htmlElementRef.nativeElement.clientHeight <= maxRequiredHeight;
-            if (isTexFits) {
-                return;
-            }
-        }
-
-        // No valid words produced
-        else if (isCurrentNodeValueSplitIntoWords) {
-            // No valid words even when splitting by letter, time to move on to the next node
-
-            // Set the current node value to the truncation character
+        // First word doesn't fit: move to previous node
+        if (!this.textFits(node, words[0] + this.truncationCharacters, maxHeight)) {
             node.nodeValue = this.truncationCharacters;
-            node = this.getLastChild(this.htmlElementRef.nativeElement);
-            return this.truncate(maxRequiredHeight, node);
+            const previousNode = this.findDeepestTextNode(this.element);
+            if (previousNode) {
+                this.truncateNode(previousNode, maxHeight);
+            }
+            return;
         }
-        return this.truncate(maxRequiredHeight, node, words, isCurrentNodeValueSplitIntoWords);
+
+        // Binary search for optimal word count
+        const optimalWordCount = this.findOptimalWordCount(node, words, maxHeight);
+        node.nodeValue = words.slice(0, optimalWordCount).join(WORD_SEPARATOR) + this.truncationCharacters;
     }
 
-    private getMaxHeight(maxLines: number, element: HTMLElement): number {
-        const lineHeight: number = this.getLineHeight(element);
-        return lineHeight * maxLines;
+    private textFits(node: ChildNode, text: string, maxHeight: number): boolean {
+        node.nodeValue = text;
+        return this.element.clientHeight <= maxHeight;
     }
 
-    private getLineHeight(element: HTMLElement): number {
-        const cssStyleDeclaration: CSSStyleDeclaration = getComputedStyle(element, 'line-height');
-        const lineHeight: string = cssStyleDeclaration.lineHeight;
-        if (cssStyleDeclaration.lineHeight === 'normal') {
-            // Normal line heights vary from browser to browser. The spec recommends a value between 1.0 and 1.2 of the font size.
-            return Math.ceil(parseInt(getComputedStyle(element, 'font-size').fontSize, 10) * 1.187);
+    private findOptimalWordCount(node: ChildNode, words: string[], maxHeight: number): number {
+        let low = 1;
+        let high = words.length;
+        let result = 1;
+
+        while (low <= high) {
+            const mid = Math.floor((low + high) / 2);
+            const testText = words.slice(0, mid).join(WORD_SEPARATOR) + this.truncationCharacters;
+
+            if (this.textFits(node, testText, maxHeight)) {
+                result = mid;
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
         }
-        return Math.ceil(parseInt(lineHeight, 10));
+
+        return result;
     }
 
-    private getMaxLines(): number {
-        // Returns the maximum number of lines of text that should be rendered based on the current height of the element and the line-height of the text.
-        const hostHtmlElement: HTMLElement = this.htmlElementRef.nativeElement;
-        const availableHeight: number = this.maxHeight ?? hostHtmlElement.clientHeight;
-        return Math.max(Math.floor(availableHeight / this.getLineHeight(hostHtmlElement)), 0);
+    private getLineHeight(): number {
+        if (this.cachedLineHeight !== null) {
+            return this.cachedLineHeight;
+        }
+
+        const styles = getComputedStyle(this.element);
+
+        if (styles.lineHeight === 'normal') {
+            const fontSize = parseFloat(styles.fontSize);
+            this.cachedLineHeight = Math.ceil(fontSize * DEFAULT_LINE_HEIGHT_MULTIPLIER);
+        } else {
+            this.cachedLineHeight = Math.ceil(parseFloat(styles.lineHeight));
+        }
+
+        return this.cachedLineHeight;
     }
 
-    private getLastChild(node: ChildNode): ChildNode {
-        // Gets an element's last child. That may be another node or a node's contents.
+    private calculateMaxLines(): number {
+        const availableHeight = this.maxHeight ?? this.element.clientHeight;
+        return Math.max(Math.floor(availableHeight / this.getLineHeight()), 0);
+    }
+
+    /**
+     * Recursively finds the deepest text node, skipping empty nodes.
+     */
+    private findDeepestTextNode(node: ChildNode): ChildNode | null {
         if (!node.lastChild) {
             return node;
         }
-        // Current element has children, need to go deeper and get last child as a text node
-        if (node.lastChild.childNodes && node.lastChild.childNodes.length > 0) {
-            return this.getLastChild(node.childNodes.item(node.childNodes.length - 1));
+
+        // Traverse to nested children
+        if (node.lastChild.childNodes?.length > 0) {
+            const lastChildIndex = node.childNodes.length - 1;
+            return this.findDeepestTextNode(node.childNodes.item(lastChildIndex)!);
         }
-        // This is the absolute last child, a text node, but something's wrong with it. Remove it and keep trying
-        else if (
-            node.lastChild.parentNode &&
-            (!node.lastChild?.nodeValue || node.lastChild.nodeValue === '' || node.lastChild.nodeValue === this.truncationCharacters)
-        ) {
+
+        // Skip empty or truncation-only nodes
+        const isEmptyNode = !node.lastChild.nodeValue
+            || node.lastChild.nodeValue === ''
+            || node.lastChild.nodeValue === this.truncationCharacters;
+
+        if (isEmptyNode && node.lastChild.parentNode) {
             node.lastChild.parentNode.removeChild(node.lastChild);
-            return this.getLastChild(this.htmlElementRef.nativeElement);
+            return this.findDeepestTextNode(this.element);
         }
-        // This is the last child we want, return it
-        else {
-            return node.lastChild;
-        }
+
+        return node.lastChild;
     }
 }
