@@ -2,7 +2,9 @@
     "name": "chitova",
     "version": "0.1.0",
     "scripts": {
+        "start": "ng serve demo",
         "build": "ng build --project=@chitova/ngx-clamp --configuration production",
+        "build:demo": "ng build demo",
         "watch": "ng build --watch --configuration development",
         "publish": "npm publish ./dist/chitova/ngx-clamp --access public",
         "prettier:fix": "prettier . --write",
@@ -15,7 +17,8 @@
         "@angular/compiler": "^20.3.0",
         "@angular/core": "^20.3.0",
         "@angular/platform-browser": "^20.3.0",
-        "tslib": "^2.3.0"
+        "tslib": "^2.3.0",
+        "zone.js": "~0.15.0"
     },
     "devDependencies": {
         "@angular/build": "^20.3.8",

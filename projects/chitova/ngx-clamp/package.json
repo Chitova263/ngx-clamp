@@ -1,20 +1,28 @@
 {
     "name": "@chitovas/ngx-clamp",
-    "version": "0.2.2",
+    "version": "1.0.0",
+    "description": "Angular directive for clamping text to a specified number of lines or height with cross-browser support.",
     "author": "Nigel Mukandi",
-    "description": "angular library designed to elegantly manage text overflow within HTML elements. This library allows you to clamp text, adding ellipsis or a truncation text of your choice when the content exceeds a specified height.",
+    "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "git://github.com/Chitova263/ngx-clamp.git"
+        "url": "git+https://github.com/Chitova263/ngx-clamp.git"
     },
+    "bugs": {
+        "url": "https://github.com/Chitova263/ngx-clamp/issues"
+    },
+    "homepage": "https://github.com/Chitova263/ngx-clamp#readme",
     "keywords": [
+        "angular",
+        "directive",
         "clamp",
+        "text-clamp",
         "line-clamp",
         "webkit-line-clamp",
-        "angular",
-        "directive"
+        "truncate",
+        "ellipsis",
+        "overflow"
     ],
-    "license": "MIT",
     "publishConfig": {
         "access": "public"
     },
@@ -25,5 +33,13 @@
     "dependencies": {
         "tslib": "^2.3.0"
     },
-    "sideEffects": false
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./index.d.ts",
+            "esm2022": "./esm2022/chitovas-ngx-clamp.mjs",
+            "esm": "./esm2022/chitovas-ngx-clamp.mjs",
+            "default": "./fesm2022/chitovas-ngx-clamp.mjs"
+        }
+    }
 }

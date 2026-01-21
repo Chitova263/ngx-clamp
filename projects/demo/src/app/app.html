@@ -1,0 +1,120 @@
+<main class="container">
+    <!-- Hero Section -->
+    <header class="hero">
+        <h1>ngx-clamp</h1>
+        <p class="tagline">Elegant text clamping for Angular applications</p>
+        <div class="badges">
+            <span class="badge">Cross-browser</span>
+            <span class="badge">Lightweight</span>
+            <span class="badge">TypeScript</span>
+        </div>
+    </header>
+
+    <!-- Interactive Playground -->
+    <section class="section">
+        <h2>Interactive Playground</h2>
+        <p class="section-desc">Adjust the line count and see the clamping in action</p>
+
+        <div class="playground">
+            <div class="controls">
+                <label>
+                    Lines: <strong>{{ lineCount() }}</strong>
+                    <input type="range" min="1" max="6" [value]="lineCount()" (input)="updateLineCount($event)" />
+                </label>
+            </div>
+            <div class="playground-content">
+                <div ngxClamp [lines]="lineCount()">
+                    Angular is a platform for building mobile and desktop web applications. With Angular, you have a framework for building
+                    efficient and sophisticated single-page apps. Angular provides a complete solution including routing, forms management,
+                    client-server communication, and more. It uses TypeScript for type safety and modern JavaScript features.
+                </div>
+            </div>
+            <pre class="code-snippet"><code>&lt;div ngxClamp [lines]="{{ lineCount() }}"&gt;
+  Your content here...
+&lt;/div&gt;</code></pre>
+        </div>
+    </section>
+
+    <!-- Blog Cards -->
+    <section class="section">
+        <h2>Blog Article Cards</h2>
+        <p class="section-desc">Perfect for article previews with expandable content</p>
+
+        <div class="article-grid">
+            @for (article of articles; track article.id) {
+            <article class="article-card">
+                <img [src]="article.image" [alt]="article.title" class="article-image" />
+                <div class="article-content">
+                    <span class="article-date">{{ article.date }}</span>
+                    <h3>{{ article.title }}</h3>
+                    <p class="article-author">By {{ article.author }}</p>
+                    <div ngxClamp [lines]="isExpanded(article.id) ? 999 : 3" truncationCharacters="..." class="article-excerpt">
+                        {{ article.content }}
+                    </div>
+                    <button class="btn-link" (click)="toggleCard(article.id)">
+                        {{ isExpanded(article.id) ? 'Show less' : 'Read more' }}
+                    </button>
+                </div>
+            </article>
+            }
+        </div>
+    </section>
+
+    <!-- Product Cards -->
+    <section class="section">
+        <h2>E-Commerce Product Cards</h2>
+        <p class="section-desc">Keep product listings clean with consistent descriptions</p>
+
+        <div class="product-grid">
+            @for (product of products; track product.name) {
+            <div class="product-card">
+                <img [src]="product.image" [alt]="product.name" class="product-image" />
+                <div class="product-content">
+                    <div class="product-rating">
+                        @for (star of [1,2,3,4,5]; track star) {
+                        <span class="star" [class.filled]="star <= product.rating">&#9733;</span>
+                        }
+                        <span class="rating-value">{{ product.rating }}</span>
+                    </div>
+                    <h3 ngxClamp [lines]="1">{{ product.name }}</h3>
+                    <p ngxClamp [lines]="2" truncationCharacters="..." class="product-desc">{{ product.description }}</p>
+                    <div class="product-footer">
+                        <span class="price">\${{ product.price }}</span>
+                        <button class="btn-primary">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section testimonials-section">
+        <h2>Testimonials</h2>
+        <p class="section-desc">What developers are saying</p>
+
+        <div class="testimonials-grid">
+            @for (testimonial of testimonials; track testimonial.name) {
+            <blockquote class="testimonial-card">
+                <p ngxClamp [lines]="4" truncationCharacters=" [...]" class="testimonial-quote">"{{ testimonial.quote }}"</p>
+                <footer class="testimonial-author">
+                    <img [src]="testimonial.avatar" [alt]="testimonial.name" class="avatar" />
+                    <div>
+                        <cite>{{ testimonial.name }}</cite>
+                        <span>{{ testimonial.role }}</span>
+                    </div>
+                </footer>
+            </blockquote>
+            }
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>
+            <a href="https://github.com/Chitova263/ngx-clamp" target="_blank">GitHub</a>
+            &middot;
+            <a href="https://www.npmjs.com/package/@chitovas/ngx-clamp" target="_blank">npm</a>
+        </p>
+    </footer>
+</main>

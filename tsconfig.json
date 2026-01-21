@@ -2,7 +2,7 @@
     "compileOnSave": false,
     "compilerOptions": {
         "paths": {
-            "@chitova/ngx-clamp": ["./dist/chitova/ngx-clamp"]
+            "@chitova/ngx-clamp": ["./projects/chitova/ngx-clamp/src/public-api"]
         },
         "strict": true,
         "noImplicitOverride": true,
@@ -30,6 +30,9 @@
         },
         {
             "path": "./projects/chitova/ngx-clamp/tsconfig.spec.json"
+        },
+        {
+            "path": "./projects/demo/tsconfig.app.json"
         }
     ]
 }
